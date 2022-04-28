@@ -1,9 +1,11 @@
 import pygame as p, random as r
 
 play=True
+dead = True
 
 win=p.display.set_mode((288, 512))
 bgimg = p.image.load('fon.png')
+
 groundimg = p.image.load('zemlya.png')
 truba = [p.image.load('truba1.png'),
 		p.image.load('truba2.png')]
@@ -102,47 +104,51 @@ trubs = []
 back = tbg()
 trubs.append(trub())
 
-a = 13579
-for i in range(len(str(a))):
-	print(str(a)[i])
-
 while play == True:
 	for event in p.event.get():
 		if event.type == p.QUIT:
 			play = False
 		
 		if event.type == p.KEYDOWN:
-			bird.jump()
+			if dead == False:
+				bird.jump()
+			else:
+				dead = False
+				bird.jump()
+				trubs = [trub()]
 			
 	back.draw1()
 	back.control()
-			
-	bird.gravity()
+	if dead == False:	
+		bird.gravity()
 	
-	for i in trubs:
-		i.control()
-		i.draw()
-		if i.x == 165:
-			trubs.append(trub())
+		for i in trubs:
+			i.control()
+			i.draw()
+			if i.x == 165:
+				trubs.append(trub())
 		
 		if i.x == 80:
 			scores = scores+1
-		
-		if i.vasya(bird) == True:
-			bird.__init__()
-			bird.jump()
-			trubs = [trub()]
-			scores = 0
+
 			
 	for i in trubs:
 		if i.x == -75:
 			trubs.remove(i)
-			
+
+		if i.vasya(bird) == True:
+			dead = True
+			bird.scores = 0
+			bird.x = 96
+			bird.y = 230
+			bird.fall_speed = 0
+
 	if bird.y>420:
-		bird.__init__()
-		bird.jump()
-		trubs = [trub()]
-		bird.scores = 0
+			dead = True
+			bird.scores = 0
+			bird.x = 96
+			bird.y = 230
+			bird.fall_speed = 0
 		
 	for i in range(len(str(bird.scores))):
 		win.blit(nums[int(str(bird.scores)[i])], (10+20*i, 10))
